@@ -2,9 +2,11 @@ package com.nft.marketplace.controller;
 
 import com.nft.marketplace.model.contract.Market;
 import com.nft.marketplace.model.contract.Message;
+import com.nft.marketplace.model.user.MarketHandler;
 import com.nft.marketplace.model.user.User;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
 import java.io.IOException;
@@ -36,13 +38,22 @@ public class MainController  implements Initializable {
     @FXML
     private ImageView POL_logo;
 
+    @FXML
+    private TextField song_title;
     private Web3j web;
 
     private User currentUser;
+
+    private MarketHandler marketHandler;
+
+    @FXML
+    private Button btn_ajout;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
-            this.web = Web3j.build(new HttpService("https://polygon-amoy.drpc.org"));
+            //this.web = Web3j.build(new HttpService("https://polygon-amoy.drpc.org"));
+            this.web = Web3j.build(new HttpService("wss://polygon-amoy-bor-rpc.publicnode.com"));
             String walletAddress ="0xEfc1Efb0F31426D88eaCF9D23Aa0233caebA6bCb";
             LoadWallet(walletAddress);
         } catch (Exception e) {
@@ -55,6 +66,9 @@ public class MainController  implements Initializable {
     {
         this.currentUser = new User(walletAddress,web);
         UpdateWalletValue();
+        LoadContracts();
+        UpdateWalletValue();
+        UpdateNFTNumbers();
     }
 
     private void UpdateWalletValue()
@@ -63,6 +77,29 @@ public class MainController  implements Initializable {
     }
 
 
+    private void LoadContracts()
+    {
+        this.marketHandler=new MarketHandler(currentUser,web);
+    }
+    @FXML
+    private void ajout()
+    {
+        String title = fetch_title();
+        if(title.length()!=0)
+        {
+            marketHandler.addNFT(title);
+        }
+    }
+
+    private String fetch_title()
+    {
+        return song_title.getText().trim();
+    }
+
+    private void UpdateNFTNumbers()
+    {
+        nft_entry.setText(String.valueOf(marketHandler.getNumberOfNFT()));
+    }
     /**
      * Loading a Smart Contract¶
      *
