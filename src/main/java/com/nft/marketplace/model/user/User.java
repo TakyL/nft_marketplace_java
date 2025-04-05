@@ -7,6 +7,8 @@ import org.web3j.utils.Convert;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.web3j.crypto.WalletUtils.isValidAddress;
 
@@ -14,6 +16,8 @@ public class User {
 
     private String Address;
     private BigDecimal polWallet;
+
+    private List<String> ownedNFT=new ArrayList<>();
 
     public User(String address, Web3j web3j) {
         if(isValidAddress(address))
@@ -49,5 +53,16 @@ public class User {
     protected String getAddress()
     {
         return Address;
+    }
+
+    public void addList(String s)
+    {
+        ownedNFT.add(s);
+    }
+
+    public List<String> getOwnedNFT(){return ownedNFT;}
+
+    public void setOwnedNFT(List<String> ownedNFT) {
+        this.ownedNFT = ownedNFT;
     }
 }

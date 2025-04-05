@@ -5,14 +5,20 @@ import com.nft.marketplace.model.user.User;
 import com.nft.marketplace.view.Modal;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 
+import java.awt.event.MouseEvent;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
@@ -33,6 +39,8 @@ public class MainController  implements Initializable {
     private Web3j web;
 
     private User currentUser;
+
+    private String clickedValue;//Value of the title song to delete
 
     private MarketHandler marketHandler;
 
@@ -63,6 +71,7 @@ public class MainController  implements Initializable {
         UpdateWalletValue();
         UpdateNFTNumbers();
         initUIProprities();
+        fillGrid();
     }
 
     private void UpdateWalletValue()
@@ -82,21 +91,21 @@ public class MainController  implements Initializable {
         if(title.length()!=0)
         {
             marketHandler.addNFT(title);
+            updateAppStatut();
         }
     }
 
     @FXML
     private void delete()
     {
-
+        if(clickedValue.trim().length() != 0) marketHandler.removeNFT(clickedValue);
     }
 
     @FXML
-    private void gridclick()
+    public void gridclick()
     {
-        //Action du gridpane qui trigger delete()
+        removeStyle(this.nft_list);
     }
-
     @FXML
     private void input_song()
     {
@@ -107,9 +116,21 @@ public class MainController  implements Initializable {
         return song_title.getText().trim();
     }
 
+    private void updateAppStatut()
+    {
+        this.song_title.setText("");
+        updateBtnStatut(btn_ajout,true);
+        UpdateWalletValue();
+        fillGrid();
+    }
+
     private void UpdateNFTNumbers()
     {
-        nft_entry.setText(String.valueOf(marketHandler.getNumberOfNFT()));
+        List a = marketHandler.getListOfNFT();
+        nft_entry.setText(String.valueOf(a.size()));
+        currentUser.setOwnedNFT((List<String>) a.stream()
+                .map(Object::toString) // or just e -> (String) e if you're sure
+                .collect(Collectors.toList()));
     }
 
     private void initUIProprities()
@@ -123,5 +144,41 @@ public class MainController  implements Initializable {
     private void updateBtnStatut(Button btn, boolean statut)
     {
         btn.setDisable(statut);
+    }
+
+    private void fillGrid(  ) {
+        List<String> items = currentUser.getOwnedNFT();
+        for (int i = 0; i < items.size(); i++) {
+            int row = i / 2;
+            int col = i % 2;
+
+            String value = items.get(i);
+            Button text = new Button(value);//TODO make a special class
+            text.setOnMouseClicked(event -> {
+                removeStyle(nft_list);
+                text.setStyle("-fx-background-color: #B0B0B0;");  // Darker shade when pressed
+                updateBtnStatut(btn_delete,false);
+                this.clickedValue=value;
+            });
+
+            this.nft_list.add(text, col, row); // (child, columnIndex, rowIndex)
+        }
+    }
+
+    private void removeStyle(Pane pane) {
+        for (Node child : pane.getChildren()) {
+            // Check if the child is a Button (or other node type that has style)
+            if (child instanceof Button) {
+                Button button = (Button) child;
+
+                // Check if the button has the specific background color style
+                if (button.getStyle().equals("-fx-background-color: #B0B0B0;") && (button.getStyle().contains("-fx-background-color: #B0B0B0;"))) {
+                        // Remove the specific background color style by resetting it
+                        button.setStyle(button.getStyle().replace("-fx-background-color: #B0B0B0;", ""));
+                        updateBtnStatut(btn_delete,true);
+
+                }
+            }
+        }
     }
 }

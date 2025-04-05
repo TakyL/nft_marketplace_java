@@ -22,9 +22,9 @@ public class MarketHandler {
     private Web3j web3jCon;
 
     private final String PRIVATE_KEY="0x116bbe4fb13bf060ad8497412aa1be43cb2be587446a37832da2d13a50a2681d";
-    private final String MARKET_ADR = "0xeCa17224556dFE004b0a5db8921a48cF2edd0d82";
+    private final String MARKET_ADR = "0xBC3911AbCe626aBF7389c8781aC2b3f1D71DD257";
 
-    private final String NFT_ADR = "0xC4a0558b821D58E6aE98e091aB68E41D0fa86E9C";
+    private final String NFT_ADR = "0xA7F2Be4e39Cb23F8a60a4E0C5408CA2570dC405d";
     private Market market;
 
     private NFT nft;
@@ -77,11 +77,10 @@ public class MarketHandler {
         }
     }
 
-    public int getNumberOfNFT()
+    public List getListOfNFT()
     {
         try {
-            List a = market.getMyNFTs().send();
-            return a.size();
+            return market.getMyNFTs().send();
         } catch (Exception e) {
             new Modal().launch("Error when fetching the list", e.getMessage().trim());
             throw new RuntimeException(e);
