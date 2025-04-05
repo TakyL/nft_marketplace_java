@@ -1,34 +1,21 @@
 package com.nft.marketplace.controller;
 
-import com.nft.marketplace.model.contract.Market;
-import com.nft.marketplace.model.contract.Message;
 import com.nft.marketplace.model.user.MarketHandler;
 import com.nft.marketplace.model.user.User;
 import com.nft.marketplace.view.Modal;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 
-import java.io.IOException;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.net.URL;
 import java.util.ResourceBundle;
 
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
-import org.w3c.dom.Text;
-import org.web3j.crypto.Credentials;
-import org.web3j.crypto.WalletUtils;
-import org.web3j.crypto.exception.CipherException;
+import javafx.scene.layout.GridPane;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.tx.ManagedTransaction;
-import org.web3j.tx.gas.DefaultGasProvider;
-import org.web3j.utils.Convert;
+
 public class MainController  implements Initializable {
     @FXML
     private TextField wallet_value;
@@ -41,6 +28,8 @@ public class MainController  implements Initializable {
 
     @FXML
     private TextField song_title;
+    @FXML
+    private GridPane nft_list;
     private Web3j web;
 
     private User currentUser;
@@ -50,6 +39,8 @@ public class MainController  implements Initializable {
     @FXML
     private Button btn_ajout;
 
+    @FXML
+    private Button btn_delete;
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         try {
@@ -71,6 +62,7 @@ public class MainController  implements Initializable {
         LoadContracts();
         UpdateWalletValue();
         UpdateNFTNumbers();
+        initUIProprities();
     }
 
     private void UpdateWalletValue()
@@ -93,6 +85,23 @@ public class MainController  implements Initializable {
         }
     }
 
+    @FXML
+    private void delete()
+    {
+
+    }
+
+    @FXML
+    private void gridclick()
+    {
+        //Action du gridpane qui trigger delete()
+    }
+
+    @FXML
+    private void input_song()
+    {
+        this.btn_ajout.setDisable(song_title.getText().trim().length() == 0);
+    }
     private String fetch_title()
     {
         return song_title.getText().trim();
@@ -101,5 +110,18 @@ public class MainController  implements Initializable {
     private void UpdateNFTNumbers()
     {
         nft_entry.setText(String.valueOf(marketHandler.getNumberOfNFT()));
+    }
+
+    private void initUIProprities()
+    {
+        this.nft_entry.setDisable(true);
+        this.wallet_value.setDisable(true);
+        updateBtnStatut(this.btn_ajout,true);
+        updateBtnStatut(this.btn_delete,true);
+    }
+
+    private void updateBtnStatut(Button btn, boolean statut)
+    {
+        btn.setDisable(statut);
     }
 }
