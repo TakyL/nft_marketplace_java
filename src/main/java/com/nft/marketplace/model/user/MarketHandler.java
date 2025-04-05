@@ -2,6 +2,7 @@ package com.nft.marketplace.model.user;
 
 import com.nft.marketplace.model.contract.Market;
 import com.nft.marketplace.model.contract.NFT;
+import com.nft.marketplace.view.Modal;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
@@ -60,6 +61,7 @@ public class MarketHandler {
             TransactionReceipt receipt = market.addNFT(songtitle,FEE).send();
             outputTransactionHash(receipt);
         } catch (Exception e) {
+            new Modal().launch("Error during the adding action ", e.getMessage().trim());
             throw new RuntimeException(e);
         }
     }
@@ -70,6 +72,7 @@ public class MarketHandler {
             TransactionReceipt receipt = market.removeNFT(songtitle).send();
             outputTransactionHash(receipt);
         } catch (Exception e) {
+            new Modal().launch("Error during remove's action", e.getMessage().trim());
             throw new RuntimeException(e);
         }
     }
@@ -80,6 +83,7 @@ public class MarketHandler {
             List a = market.getMyNFTs().send();
             return a.size();
         } catch (Exception e) {
+            new Modal().launch("Error when fetching the list", e.getMessage().trim());
             throw new RuntimeException(e);
         }
     }
