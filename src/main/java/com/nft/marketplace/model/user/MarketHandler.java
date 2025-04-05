@@ -21,7 +21,7 @@ public class MarketHandler {
 
     private Web3j web3jCon;
 
-    private final String PRIVATE_KEY="0x7027ae27ebaf9370b5711911db1d9f27042a65be19aea0d95c5738e40f5ad787";
+    private final String PRIVATE_KEY="0x116bbe4fb13bf060ad8497412aa1be43cb2be587446a37832da2d13a50a2681d";
     private final String MARKET_ADR = "0xeCa17224556dFE004b0a5db8921a48cF2edd0d82";
 
     private final String NFT_ADR = "0xC4a0558b821D58E6aE98e091aB68E41D0fa86E9C";
@@ -47,7 +47,7 @@ public class MarketHandler {
         DefaultGasProvider gasProvider = new DefaultGasProvider();
         long chainId = 80002;
         RawTransactionManager txManager = new RawTransactionManager(web3jCon, credentials, chainId);
-        BigInteger gasPrice = BigInteger.valueOf(25000000000L); // Set gas price (example: 25 gwei or 25 * 10^9)
+        BigInteger gasPrice = BigInteger.valueOf(100000000000L); // Set gas price (example: 25 gwei or 25 * 10^9)
         BigInteger gasLimit = BigInteger.valueOf(500000);
 
         this.market = Market.load(MARKET_ADR,web3jCon, txManager,new StaticGasProvider(gasPrice, gasLimit));

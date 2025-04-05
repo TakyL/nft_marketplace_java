@@ -46,7 +46,7 @@ public class MainController  implements Initializable {
         try {
             //this.web = Web3j.build(new HttpService("https://polygon-amoy.drpc.org"));
             this.web = Web3j.build(new HttpService("wss://polygon-amoy-bor-rpc.publicnode.com"));
-            String walletAddress ="0xEfc1Efb0F31426D88eaCF9D23Aa0233caebA6bCb";
+            String walletAddress ="0x501AFfB9402246e0E522aDaf7e2638A41859a426";
             LoadWallet(walletAddress);
         } catch (Exception e) {
              new Modal().launch("Error", e.getMessage().trim());
