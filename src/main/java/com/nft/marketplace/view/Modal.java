@@ -8,26 +8,40 @@ import javafx.stage.Stage;
 
 public class Modal {
 
-    public void launch(String titlePopUp,String message)
+    private Stage stage;
+    private Scene scene;
+    private Label lbl_msg;
+    public Modal() {
+        this.stage=new Stage();
+        stage.initModality(Modality.APPLICATION_MODAL);
+        stage.setResizable(false);
+    }
+
+    public void launch(String titlePopUp, String message)
     {
-        Stage dialog = new Stage();
+        Stage dialog = stage;
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.setTitle(titlePopUp);
 
-        dialog.setResizable(false);
+        this.lbl_msg = new Label(message);
 
-        // Create a label to display the message
-        Label label = new Label(message);
-
-        // Create a layout and add the label to it
         VBox layout = new VBox(10);
-        layout.getChildren().add(label);
+        layout.getChildren().add(lbl_msg);
 
-        // Create a scene and add the layout to it
-        Scene scene = new Scene(layout);
+        this.scene = new Scene(layout);
 
-        // Set the scene and show the dialog
         dialog.setScene(scene);
         dialog.showAndWait();
+    }
+
+    public void updateModal(String modalTitle, String msg)
+    {
+        stage.setTitle(modalTitle);
+        lbl_msg.setText(msg);
+    }
+
+    public void close()
+    {
+        stage.close();
     }
 }

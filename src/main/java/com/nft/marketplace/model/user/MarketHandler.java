@@ -3,8 +3,10 @@ package com.nft.marketplace.model.user;
 import com.nft.marketplace.model.contract.Market;
 import com.nft.marketplace.model.contract.NFT;
 import com.nft.marketplace.view.Modal;
+import javafx.application.Platform;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.RemoteFunctionCall;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
@@ -30,6 +32,8 @@ public class MarketHandler {
     private NFT nft;
     ///!\ Problem when trying to call FeeInWei function from Contract's class
     private final BigInteger FEE;
+
+    private Modal pendingModal;
     public MarketHandler(User user,Web3j web3j)
     {   if(user == null && web3j == null)
     {
@@ -58,8 +62,8 @@ public class MarketHandler {
     public void addNFT(String songtitle)
     {
         try {
-            TransactionReceipt receipt = market.addNFT(songtitle,FEE).send();
-            outputTransactionHash(receipt);
+            RemoteFunctionCall<TransactionReceipt> remoteFunctionCall = market.addNFT(songtitle,FEE);
+            handleTransaction(remoteFunctionCall);
         } catch (Exception e) {
             new Modal().launch("Error during the adding action ", e.getMessage().trim());
             throw new RuntimeException(e);
@@ -69,8 +73,8 @@ public class MarketHandler {
     public void removeNFT(String songtitle)
     {
         try {
-            TransactionReceipt receipt = market.removeNFT(songtitle).send();
-            outputTransactionHash(receipt);
+            RemoteFunctionCall<TransactionReceipt> remoteFunctionCall  = market.removeNFT(songtitle);
+            handleTransaction(remoteFunctionCall);
         } catch (Exception e) {
             new Modal().launch("Error during remove's action", e.getMessage().trim());
             throw new RuntimeException(e);
@@ -90,6 +94,23 @@ public class MarketHandler {
     private void outputTransactionHash(TransactionReceipt receipt)
     {
         System.out.println("Action effectue : "+ receipt.getTransactionHash());
+    }
+
+    private void openPendingModal()
+    {
+        this.pendingModal=new Modal();
+        this.pendingModal.launch("Pending","Transaction Pending, please wait !");
+    }
+
+    private void handleTransaction(RemoteFunctionCall<TransactionReceipt> rFC) {
+        openPendingModal();
+        rFC.sendAsync().thenAccept(receipt -> {
+            Platform.runLater(() -> {
+                pendingModal.updateModal("Transaction done ! ","Transaction completed with hash: " + receipt.getTransactionHash());
+                pendingModal.close();
+                outputTransactionHash(receipt);
+            });
+        });
     }
 
 }

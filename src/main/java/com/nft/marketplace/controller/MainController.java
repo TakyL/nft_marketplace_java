@@ -56,6 +56,10 @@ public class MainController  implements Initializable {
             this.web = Web3j.build(new HttpService("wss://polygon-amoy-bor-rpc.publicnode.com"));
             String walletAddress ="0x501AFfB9402246e0E522aDaf7e2638A41859a426";
             LoadWallet(walletAddress);
+            UpdateNFTNumbers();
+            initUIProprities();
+            fillGrid();
+
         } catch (Exception e) {
              new Modal().launch("Error", e.getMessage().trim());
              throw new RuntimeException(e);
@@ -69,9 +73,6 @@ public class MainController  implements Initializable {
         UpdateWalletValue();
         LoadContracts();
         UpdateWalletValue();
-        UpdateNFTNumbers();
-        initUIProprities();
-        fillGrid();
     }
 
     private void UpdateWalletValue()
