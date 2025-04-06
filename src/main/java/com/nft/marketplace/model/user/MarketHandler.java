@@ -1,7 +1,6 @@
 package com.nft.marketplace.model.user;
 
 import com.nft.marketplace.model.contract.Market;
-import com.nft.marketplace.model.contract.NFT;
 import com.nft.marketplace.view.Modal;
 import javafx.application.Platform;
 import org.web3j.abi.FunctionEncoder;
@@ -19,7 +18,6 @@ import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.core.methods.response.EthCall;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.RawTransactionManager;
-import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.tx.gas.StaticGasProvider;
 import org.web3j.utils.Convert;
 
@@ -29,6 +27,9 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Class that runs the market command to blockchain
+ */
 public class MarketHandler {
 
     private Credentials userCrendentials;
@@ -37,82 +38,99 @@ public class MarketHandler {
 
     private final String MARKET_ADR = "0xBC3911AbCe626aBF7389c8781aC2b3f1D71DD257";
 
-    private final String NFT_ADR = "0xA7F2Be4e39Cb23F8a60a4E0C5408CA2570dC405d";
     private Market market;
 
-    private NFT nft;
     ///!\ Problem when trying to call FeeInWei function from Contract's class
     private final BigInteger FEE;
 
     private Modal pendingModal;
-    public MarketHandler(User user,Web3j web3j)
-    {   if(user == null && web3j == null)
-    {
-        throw new IllegalArgumentException("User or connection null");
-    }
+
+    public MarketHandler(User user, Web3j web3j) {
+        if (user == null && web3j == null) {
+            throw new IllegalArgumentException("User or connection null");
+        }
         this.userCrendentials = Credentials.create(user.getKey());
-        this.web3jCon =web3j;
+        this.web3jCon = web3j;
         this.ContractMarketLoad();
-        this.FEE=Convert.toWei(new BigDecimal("0.05"), Convert.Unit.GWEI).toBigInteger();
+        this.FEE = Convert.toWei(new BigDecimal("0.05"), Convert.Unit.GWEI).toBigInteger();
     }
 
-    private void ContractMarketLoad()
-    {
-        DefaultGasProvider gasProvider = new DefaultGasProvider();
-        long chainId = 80002;
-        RawTransactionManager txManager = new RawTransactionManager(web3jCon, userCrendentials, chainId);
-        BigInteger gasPrice = BigInteger.valueOf(100000000000L); // Set gas price (example: 25 gwei or 25 * 10^9)
+    /**
+     *  Load the market class for the transactions
+     */
+    private void ContractMarketLoad() {
+        RawTransactionManager txManager = new RawTransactionManager(web3jCon, userCrendentials, 80002);
+        BigInteger gasPrice = BigInteger.valueOf(100000000000L); // Value : 100gwei
         BigInteger gasLimit = BigInteger.valueOf(500000);
 
-        this.market = Market.load(MARKET_ADR,web3jCon, txManager,new StaticGasProvider(gasPrice, gasLimit));
-        this.nft = NFT.load(NFT_ADR, web3jCon, userCrendentials,gasProvider);
-
+        this.market = Market.load(MARKET_ADR, web3jCon, txManager, new StaticGasProvider(gasPrice, gasLimit));
     }
 
-    public void addNFT(String songtitle,Runnable runnable)
-    {
+    /**
+     * Run the market addNFT function
+     * @param songtitle : Title of the song
+     * @param runnable : The callback used for updating UI components
+     */
+    public void addNFT(String songtitle, Runnable runnable) {
         try {
-            RemoteFunctionCall<TransactionReceipt> remoteFunctionCall = market.addNFT(songtitle,FEE);
-            handleTransaction(remoteFunctionCall,runnable);
+            RemoteFunctionCall<TransactionReceipt> remoteFunctionCall = market.addNFT(songtitle, FEE);
+            handleTransaction(remoteFunctionCall, runnable);
         } catch (Exception e) {
             new Modal().launch("Error during the adding action ", e.getMessage().trim());
             throw new RuntimeException(e);
         }
     }
-
-    public void removeNFT(String songtitle,Runnable runnable)
-    {
+    /**
+     * Run the market removeNFT function
+     * @param songtitle : Title of the song
+     * @param runnable : The callback used for updating UI components
+     */
+    public void removeNFT(String songtitle, Runnable runnable) {
         try {
-            RemoteFunctionCall<TransactionReceipt> remoteFunctionCall  = market.removeNFT(songtitle);
-            handleTransaction(remoteFunctionCall,runnable);
+            RemoteFunctionCall<TransactionReceipt> remoteFunctionCall = market.removeNFT(songtitle);
+            handleTransaction(remoteFunctionCall, runnable);
         } catch (Exception e) {
             new Modal().launch("Error during remove's action", e.getMessage().trim());
             throw new RuntimeException(e);
         }
     }
 
-    public List getListOfNFT()
-    {
+    /**
+     * Fetch the list of the nft that the user has
+     * @return List of string of song, may be empty if user has no nft
+     */
+    public List getListOfNFT() {
         try {
-            return test();
+            return fetchNFTandDecode();
         } catch (Exception e) {
             new Modal().launch("Error when fetching the list", e.getMessage().trim());
             throw new RuntimeException(e);
         }
     }
 
-    private void outputTransactionHash(TransactionReceipt receipt)
-    {
-        System.out.println("Action effectue : "+ receipt.getTransactionHash());
+    /**
+     * Output to the console
+     * @param receipt : Transaction
+     */
+    private void outputTransactionHash(TransactionReceipt receipt) {
+        System.out.println("Action effectue : " + receipt.getTransactionHash());
     }
 
-    private void openPendingModal()
-    {
-        this.pendingModal=new Modal();
-        this.pendingModal.launch("Pending","Transaction Pending, please wait !");
+    /**
+     * Open a pending modal
+     */
+    private void openPendingModal() {
+        this.pendingModal = new Modal();
+        this.pendingModal.launch("Pending", "Transaction Pending, please wait !");
     }
 
-    private void handleTransaction(RemoteFunctionCall<TransactionReceipt> rFC,Runnable callback) {
+    /**
+     * Run the transaction async
+     * If not async, high chance of craches due to the fact that javafx run on one thread, will satured the thread and so freeze the app
+     * @param rFC : The Transaction that we are calling
+     * @param callback : Run callback operations when the transaction is finished
+     */
+    private void handleTransaction(RemoteFunctionCall<TransactionReceipt> rFC, Runnable callback) {
         rFC.sendAsync().thenAccept(receipt -> {
             Platform.runLater(() -> {
                 //openPendingModal();
@@ -120,17 +138,23 @@ public class MarketHandler {
                 //pendingModal.close();
                 outputTransactionHash(receipt);
 
-                if(callback != null) callback.run();
+                if (callback != null) callback.run();
             });
         });
     }
 
-    private List<Utf8String> test()
-    {
+    /**
+     * Fetch the NFT of the user
+     * Run the contract transaction getMyNFTs without using the contract's class
+     * This is due the getMyNFTs's return is encoded in bytes, so this function handles the decode part
+     * @return List of string in utf8
+     */
+    private List<Utf8String> fetchNFTandDecode() {
         Function function = new Function(
                 "getMyNFTs",
                 Collections.emptyList(), // No parameters
-                Collections.singletonList(new TypeReference<DynamicArray<Utf8String>>() {}) // Return type
+                Collections.singletonList(new TypeReference<DynamicArray<Utf8String>>() {
+                })
         );
         String encodedFunction = FunctionEncoder.encode(function);
 
@@ -142,9 +166,6 @@ public class MarketHandler {
             List<Type> decoded = FunctionReturnDecoder.decode(response.getResult(), function.getOutputParameters());
             List<Utf8String> nftList = (List<Utf8String>) decoded.get(0).getValue();
 
-/*            for (Utf8String nft : nftList) {
-                System.out.println(nft.getValue());
-            }*/
             return nftList;
         } catch (IOException e) {
             throw new RuntimeException(e);

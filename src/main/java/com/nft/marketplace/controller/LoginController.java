@@ -1,7 +1,7 @@
 package com.nft.marketplace.controller;
 
 import com.nft.marketplace.model.user.UserInputStorage;
-import com.nft.marketplace.view.MainApplication;
+import com.nft.marketplace.view.ViewApp;
 import com.nft.marketplace.view.Modal;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -90,7 +90,7 @@ public class LoginController implements Initializable {
     private void runMainView()
     {
         try {
-            new MainApplication(new UserInputStorage(getTextFromTextField(address_input),getTextFromTextField(key_input))).start(new Stage());
+            new ViewApp(new UserInputStorage(getTextFromTextField(address_input),getTextFromTextField(key_input))).start(new Stage());
         } catch (IOException e) {
             new Modal().launch("Unexcepted error",e.getMessage());
             throw new RuntimeException(e);

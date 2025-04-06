@@ -13,12 +13,17 @@ import java.util.List;
 
 import static org.web3j.crypto.WalletUtils.isValidAddress;
 
+/**
+ * Represent the connected user
+ */
 public class User {
 
     private String address;
+    //The user's wallet value in POL
     private BigDecimal polWallet;
 
     private String key;
+    //List of title owned by the user
     private List<Utf8String> ownedNFT=new ArrayList<>();
 
     public User(UserInputStorage inputStorage, Web3j web3j) {
@@ -38,8 +43,7 @@ public class User {
         EthGetBalance balanceResponse = null;
         try {
             balanceResponse = webEntry.ethGetBalance(this.address,
-                            org.web3j.protocol.core.DefaultBlockParameterName.LATEST)
-                    .send();
+                            org.web3j.protocol.core.DefaultBlockParameterName.LATEST).send();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

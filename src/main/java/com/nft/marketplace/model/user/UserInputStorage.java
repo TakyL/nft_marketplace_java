@@ -1,5 +1,8 @@
 package com.nft.marketplace.model.user;
 
+/**
+ * Store the user input from login page
+ */
 public class UserInputStorage {
 
     private String address;

@@ -6,6 +6,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+/**
+ * A modal mainly using as of pop up for user
+ */
 public class Modal {
 
     private Stage stage;
@@ -17,6 +20,11 @@ public class Modal {
         stage.setResizable(false);
     }
 
+    /**
+     * Launch the modal
+     * @param titlePopUp : Window title i.e Error
+     * @param message : Displayed message
+     */
     public void launch(String titlePopUp, String message)
     {
         Stage dialog = stage;
