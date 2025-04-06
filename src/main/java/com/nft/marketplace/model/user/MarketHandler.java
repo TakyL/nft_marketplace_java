@@ -69,22 +69,22 @@ public class MarketHandler {
 
     }
 
-    public void addNFT(String songtitle)
+    public void addNFT(String songtitle,Runnable runnable)
     {
         try {
             RemoteFunctionCall<TransactionReceipt> remoteFunctionCall = market.addNFT(songtitle,FEE);
-            handleTransaction(remoteFunctionCall);
+            handleTransaction(remoteFunctionCall,runnable);
         } catch (Exception e) {
             new Modal().launch("Error during the adding action ", e.getMessage().trim());
             throw new RuntimeException(e);
         }
     }
 
-    public void removeNFT(String songtitle)
+    public void removeNFT(String songtitle,Runnable runnable)
     {
         try {
             RemoteFunctionCall<TransactionReceipt> remoteFunctionCall  = market.removeNFT(songtitle);
-            handleTransaction(remoteFunctionCall);
+            handleTransaction(remoteFunctionCall,runnable);
         } catch (Exception e) {
             new Modal().launch("Error during remove's action", e.getMessage().trim());
             throw new RuntimeException(e);
@@ -112,13 +112,15 @@ public class MarketHandler {
         this.pendingModal.launch("Pending","Transaction Pending, please wait !");
     }
 
-    private void handleTransaction(RemoteFunctionCall<TransactionReceipt> rFC) {
-        openPendingModal();
+    private void handleTransaction(RemoteFunctionCall<TransactionReceipt> rFC,Runnable callback) {
         rFC.sendAsync().thenAccept(receipt -> {
             Platform.runLater(() -> {
-                pendingModal.updateModal("Transaction done ! ","Transaction completed with hash: " + receipt.getTransactionHash());
-                pendingModal.close();
+                //openPendingModal();
+                //pendingModal.updateModal("Transaction done ! ","Transaction completed with hash: " + receipt.getTransactionHash());
+                //pendingModal.close();
                 outputTransactionHash(receipt);
+
+                if(callback != null) callback.run();
             });
         });
     }

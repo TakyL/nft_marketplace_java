@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -36,6 +37,9 @@ public class MainController {
 
     @FXML
     private TextField song_title;
+
+    @FXML
+    private Label lbl_pending;
     @FXML
     private GridPane nft_list;
     private Web3j web;
@@ -66,7 +70,6 @@ public class MainController {
         try {
             //this.web = Web3j.build(new HttpService("https://polygon-amoy.drpc.org"));
             this.web = Web3j.build(new HttpService("wss://polygon-amoy-bor-rpc.publicnode.com"));
-            String walletAddress ="0x501AFfB9402246e0E522aDaf7e2638A41859a426";
             this.currentUser = new User(userInputStorage,web);
             LoadWallet();
             UpdateNFTNumbers();
@@ -103,15 +106,19 @@ public class MainController {
         String title = fetch_title();
         if(title.length()!=0)
         {
-            marketHandler.addNFT(title);
-            updateAppStatut();
+            marketHandler.addNFT(title,()->updateAppStatut());
+            runPending();
         }
     }
 
     @FXML
     private void delete()
     {
-        if(clickedValue.trim().length() != 0) marketHandler.removeNFT(clickedValue);
+        if(clickedValue.trim().length() != 0)
+        {
+            marketHandler.removeNFT(clickedValue,()->updateAppStatut());
+            runPending();
+        }
     }
 
     @FXML
@@ -132,6 +139,7 @@ public class MainController {
     private void updateAppStatut()
     {
         this.song_title.setText("");
+        this.lbl_pending.setText("");
         updateBtnStatut(btn_ajout,true);
         UpdateWalletValue();
         fillGrid();
@@ -157,14 +165,27 @@ public class MainController {
         btn.setDisable(statut);
     }
 
-    private void fillGrid(  ) {
+    private void runPending()
+    {
+        updateBtnStatut(btn_ajout,true);
+        updateBtnStatut(btn_delete,true);
+        printPendingMsg();
+        disabledAllBtn();
+    }
+    private void fillGrid() {
+        UpdateNFTNumbers();
+        clearBtnGrid(nft_list);
+        createBtnGrid();
+    }
+
+    private void createBtnGrid () {
         List<Utf8String> items = currentUser.getOwnedNFT();
         for (int i = 0; i < items.size(); i++) {
             int row = i / 2;
             int col = i % 2;
 
             String value = String.valueOf(items.get(i));
-            Button text = new Button(value);//TODO make a special class
+            Button text = new Button(value);
             text.setOnMouseClicked(event -> {
                 removeStyle(nft_list);
                 text.setStyle("-fx-background-color: #B0B0B0;");  // Darker shade when pressed
@@ -187,9 +208,26 @@ public class MainController {
                         // Remove the specific background color style by resetting it
                         button.setStyle(button.getStyle().replace("-fx-background-color: #B0B0B0;", ""));
                         updateBtnStatut(btn_delete,true);
-
                 }
             }
         }
     }
+
+    private void printPendingMsg()
+    {
+        this.lbl_pending.setText("Pending ...");
+    }
+
+    private void clearBtnGrid(Pane pane)
+    {
+        pane.getChildren().clear();
+    }
+
+    private void disabledAllBtn()
+    {
+        for (Node node : nft_list.getChildren()) {
+            if (node instanceof Button) {
+                node.setDisable(true);
+            }
+        }    }
 }
