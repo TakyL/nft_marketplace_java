@@ -38,6 +38,10 @@ public class User {
         }
     }
 
+    /**
+     * Load the wallet
+     * @param webEntry
+     */
     private void loadWallet(Web3j webEntry)
     {
         EthGetBalance balanceResponse = null;
@@ -68,5 +72,10 @@ public class User {
 
     public void setOwnedNFT(List<Utf8String> ownedNFT) {
         this.ownedNFT = ownedNFT;
+    }
+
+    public void updateUserWallet(Web3j web3j)
+    {
+        loadWallet(web3j);
     }
 }

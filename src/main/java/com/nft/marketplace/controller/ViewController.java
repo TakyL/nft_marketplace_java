@@ -92,7 +92,7 @@ public class ViewController {
      */
     private void UpdateWalletValue()
     {
-        //TODO call user update
+        currentUser.updateUserWallet(web);
         this.wallet_value.setText(currentUser.getPOLvalue().toString());
     }
 
