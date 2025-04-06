@@ -168,7 +168,8 @@ public class ViewController {
     {
         this.song_title.setText("");
         this.lbl_pending.setText("");
-        updateBtnStatut(btn_ajout,true);
+        updateBtnStatut(btn_ajout,true);//Guarantee that btn add not clickable
+        song_title.setDisable(false);//Garantee that textfield is editable
         UpdateWalletValue();
         fillGrid();
     }
@@ -213,6 +214,7 @@ public class ViewController {
     {
         updateBtnStatut(btn_ajout,true);
         updateBtnStatut(btn_delete,true);
+        song_title.setDisable(true);//TextField unmodifiable by user
         printPendingMsg();
         disabledAllBtn();//User can't click on others nft's because a transaction is pending
     }

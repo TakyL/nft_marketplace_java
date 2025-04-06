@@ -74,6 +74,10 @@ public class User {
         this.ownedNFT = ownedNFT;
     }
 
+    /**
+     * Update the wallet value of the user
+     * @param web3j
+     */
     public void updateUserWallet(Web3j web3j)
     {
         loadWallet(web3j);
