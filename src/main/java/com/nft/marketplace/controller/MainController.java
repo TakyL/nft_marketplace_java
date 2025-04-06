@@ -2,6 +2,7 @@ package com.nft.marketplace.controller;
 
 import com.nft.marketplace.model.user.MarketHandler;
 import com.nft.marketplace.model.user.User;
+import com.nft.marketplace.model.user.UserInputStorage;
 import com.nft.marketplace.view.Modal;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -23,7 +24,7 @@ import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
-public class MainController  implements Initializable {
+public class MainController {
     @FXML
     private TextField wallet_value;
 
@@ -50,27 +51,37 @@ public class MainController  implements Initializable {
 
     @FXML
     private Button btn_delete;
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+    private UserInputStorage userInputStorage;
+
+    public void fetchLoginData(UserInputStorage data)
+    {
+        this.userInputStorage = data;
+    }
+
+
+
+    public void init()
+    {
         try {
             //this.web = Web3j.build(new HttpService("https://polygon-amoy.drpc.org"));
             this.web = Web3j.build(new HttpService("wss://polygon-amoy-bor-rpc.publicnode.com"));
             String walletAddress ="0x501AFfB9402246e0E522aDaf7e2638A41859a426";
-            LoadWallet(walletAddress);
+            this.currentUser = new User(userInputStorage,web);
+            LoadWallet();
             UpdateNFTNumbers();
             initUIProprities();
             fillGrid();
 
         } catch (Exception e) {
-             new Modal().launch("Error", e.getMessage().trim());
-             throw new RuntimeException(e);
+            new Modal().launch("Error", e.getMessage().trim());
+            throw new RuntimeException(e);
         }
     }
 
 
-    private void LoadWallet(String walletAddress)
+    private void LoadWallet()
     {
-        this.currentUser = new User(walletAddress,web);
         UpdateWalletValue();
         LoadContracts();
         UpdateWalletValue();

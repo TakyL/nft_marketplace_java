@@ -31,11 +31,10 @@ import java.util.List;
 
 public class MarketHandler {
 
-    private User userAddress;
+    private Credentials userCrendentials;
 
     private Web3j web3jCon;
 
-    private final String PRIVATE_KEY="0x116bbe4fb13bf060ad8497412aa1be43cb2be587446a37832da2d13a50a2681d";
     private final String MARKET_ADR = "0xBC3911AbCe626aBF7389c8781aC2b3f1D71DD257";
 
     private final String NFT_ADR = "0xA7F2Be4e39Cb23F8a60a4E0C5408CA2570dC405d";
@@ -51,7 +50,7 @@ public class MarketHandler {
     {
         throw new IllegalArgumentException("User or connection null");
     }
-        this.userAddress=user;
+        this.userCrendentials = Credentials.create(user.getKey());
         this.web3jCon =web3j;
         this.ContractMarketLoad();
         this.FEE=Convert.toWei(new BigDecimal("0.05"), Convert.Unit.GWEI).toBigInteger();
@@ -59,15 +58,14 @@ public class MarketHandler {
 
     private void ContractMarketLoad()
     {
-        Credentials credentials = Credentials.create(PRIVATE_KEY);
         DefaultGasProvider gasProvider = new DefaultGasProvider();
         long chainId = 80002;
-        RawTransactionManager txManager = new RawTransactionManager(web3jCon, credentials, chainId);
+        RawTransactionManager txManager = new RawTransactionManager(web3jCon, userCrendentials, chainId);
         BigInteger gasPrice = BigInteger.valueOf(100000000000L); // Set gas price (example: 25 gwei or 25 * 10^9)
         BigInteger gasLimit = BigInteger.valueOf(500000);
 
         this.market = Market.load(MARKET_ADR,web3jCon, txManager,new StaticGasProvider(gasPrice, gasLimit));
-        this.nft = NFT.load(NFT_ADR, web3jCon, credentials,gasProvider);
+        this.nft = NFT.load(NFT_ADR, web3jCon, userCrendentials,gasProvider);
 
     }
 
@@ -133,11 +131,10 @@ public class MarketHandler {
                 Collections.singletonList(new TypeReference<DynamicArray<Utf8String>>() {}) // Return type
         );
         String encodedFunction = FunctionEncoder.encode(function);
-        Credentials credentials = Credentials.create(PRIVATE_KEY);
 
         try {
             EthCall response = web3jCon.ethCall(
-                    Transaction.createEthCallTransaction(credentials.getAddress(), market.getContractAddress(), encodedFunction),
+                    Transaction.createEthCallTransaction(userCrendentials.getAddress(), market.getContractAddress(), encodedFunction),
                     DefaultBlockParameterName.LATEST
             ).send();
             List<Type> decoded = FunctionReturnDecoder.decode(response.getResult(), function.getOutputParameters());

@@ -15,15 +15,17 @@ import static org.web3j.crypto.WalletUtils.isValidAddress;
 
 public class User {
 
-    private String Address;
+    private String address;
     private BigDecimal polWallet;
 
+    private String key;
     private List<Utf8String> ownedNFT=new ArrayList<>();
 
-    public User(String address, Web3j web3j) {
-        if(isValidAddress(address))
+    public User(UserInputStorage inputStorage, Web3j web3j) {
+        if(isValidAddress(inputStorage.getAddress()))
         {
-            Address = address;
+            this.address = inputStorage.getAddress();
+            this.key = inputStorage.getKey();
             this.loadWallet(web3j);
         }else
         {
@@ -35,7 +37,7 @@ public class User {
     {
         EthGetBalance balanceResponse = null;
         try {
-            balanceResponse = webEntry.ethGetBalance(this.Address,
+            balanceResponse = webEntry.ethGetBalance(this.address,
                             org.web3j.protocol.core.DefaultBlockParameterName.LATEST)
                     .send();
         } catch (IOException e) {
@@ -51,10 +53,12 @@ public class User {
         return polWallet;
     }
 
-    protected String getAddress()
+    public String getAddress()
     {
-        return Address;
+        return address;
     }
+
+    public String getKey(){return  key;}
 
     public List<Utf8String> getOwnedNFT(){return ownedNFT;}
 
