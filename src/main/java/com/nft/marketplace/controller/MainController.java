@@ -19,6 +19,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Text;
+import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.http.HttpService;
 
@@ -127,11 +128,9 @@ public class MainController  implements Initializable {
 
     private void UpdateNFTNumbers()
     {
-        List a = marketHandler.getListOfNFT();
-        nft_entry.setText(String.valueOf(a.size()));
-        currentUser.setOwnedNFT((List<String>) a.stream()
-                .map(Object::toString) // or just e -> (String) e if you're sure
-                .collect(Collectors.toList()));
+        List<Utf8String> addressNfts =marketHandler.getListOfNFT();
+        nft_entry.setText(String.valueOf(addressNfts.size()));
+        currentUser.setOwnedNFT(addressNfts);
     }
 
     private void initUIProprities()
@@ -148,12 +147,12 @@ public class MainController  implements Initializable {
     }
 
     private void fillGrid(  ) {
-        List<String> items = currentUser.getOwnedNFT();
+        List<Utf8String> items = currentUser.getOwnedNFT();
         for (int i = 0; i < items.size(); i++) {
             int row = i / 2;
             int col = i % 2;
 
-            String value = items.get(i);
+            String value = String.valueOf(items.get(i));
             Button text = new Button(value);//TODO make a special class
             text.setOnMouseClicked(event -> {
                 removeStyle(nft_list);

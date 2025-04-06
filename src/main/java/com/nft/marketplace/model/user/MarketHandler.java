@@ -4,17 +4,29 @@ import com.nft.marketplace.model.contract.Market;
 import com.nft.marketplace.model.contract.NFT;
 import com.nft.marketplace.view.Modal;
 import javafx.application.Platform;
+import org.web3j.abi.FunctionEncoder;
+import org.web3j.abi.FunctionReturnDecoder;
+import org.web3j.abi.TypeReference;
+import org.web3j.abi.datatypes.DynamicArray;
+import org.web3j.abi.datatypes.Function;
+import org.web3j.abi.datatypes.Type;
+import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 import org.web3j.protocol.core.RemoteFunctionCall;
+import org.web3j.protocol.core.methods.request.Transaction;
+import org.web3j.protocol.core.methods.response.EthCall;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.tx.gas.StaticGasProvider;
 import org.web3j.utils.Convert;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 
 public class MarketHandler {
@@ -84,7 +96,7 @@ public class MarketHandler {
     public List getListOfNFT()
     {
         try {
-            return market.getMyNFTs().send();
+            return test();
         } catch (Exception e) {
             new Modal().launch("Error when fetching the list", e.getMessage().trim());
             throw new RuntimeException(e);
@@ -111,6 +123,33 @@ public class MarketHandler {
                 outputTransactionHash(receipt);
             });
         });
+    }
+
+    private List<Utf8String> test()
+    {
+        Function function = new Function(
+                "getMyNFTs",
+                Collections.emptyList(), // No parameters
+                Collections.singletonList(new TypeReference<DynamicArray<Utf8String>>() {}) // Return type
+        );
+        String encodedFunction = FunctionEncoder.encode(function);
+        Credentials credentials = Credentials.create(PRIVATE_KEY);
+
+        try {
+            EthCall response = web3jCon.ethCall(
+                    Transaction.createEthCallTransaction(credentials.getAddress(), market.getContractAddress(), encodedFunction),
+                    DefaultBlockParameterName.LATEST
+            ).send();
+            List<Type> decoded = FunctionReturnDecoder.decode(response.getResult(), function.getOutputParameters());
+            List<Utf8String> nftList = (List<Utf8String>) decoded.get(0).getValue();
+
+/*            for (Utf8String nft : nftList) {
+                System.out.println(nft.getValue());
+            }*/
+            return nftList;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

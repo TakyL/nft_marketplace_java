@@ -1,5 +1,6 @@
 package com.nft.marketplace.model.user;
 
+import org.web3j.abi.datatypes.Utf8String;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.EthGetBalance;
 import org.web3j.utils.Convert;
@@ -17,7 +18,7 @@ public class User {
     private String Address;
     private BigDecimal polWallet;
 
-    private List<String> ownedNFT=new ArrayList<>();
+    private List<Utf8String> ownedNFT=new ArrayList<>();
 
     public User(String address, Web3j web3j) {
         if(isValidAddress(address))
@@ -55,14 +56,9 @@ public class User {
         return Address;
     }
 
-    public void addList(String s)
-    {
-        ownedNFT.add(s);
-    }
+    public List<Utf8String> getOwnedNFT(){return ownedNFT;}
 
-    public List<String> getOwnedNFT(){return ownedNFT;}
-
-    public void setOwnedNFT(List<String> ownedNFT) {
+    public void setOwnedNFT(List<Utf8String> ownedNFT) {
         this.ownedNFT = ownedNFT;
     }
 }
