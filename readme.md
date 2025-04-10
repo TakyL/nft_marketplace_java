@@ -15,7 +15,7 @@
 Le principe de ce projet est de pouvoir certifier de manière simple les chansons d'un auteur au sein de la blockchain. Pour ce faire, cette application JAVA permet à une addresse d'enrengistrer des titres de chansons sous forme de NFT en échange d'une taxe à hauteur de 0.05 gwei.
 Il peut également consulter les chansons  et les retirer.
 
-Hebergé chez polygon amoy, et en utilisant les contrats suivants : [market](https://polygonscan.com/address/0xBC3911AbCe626aBF7389c8781aC2b3f1D71DD257) et [nft](https://polygonscan.com/address/0xA7F2Be4e39Cb23F8a60a4E0C5408CA2570dC405d) dont la code source se trouve [ici](https://github.com/TakyL/nft_marketplace_solidity).
+Hebergé chez polygon amoy, et en utilisant les contrats suivants : [market](https://polygonscan.com/address/0xBC3911AbCe626aBF7389c8781aC2b3f1D71DD257) et [nft](https://polygonscan.com/address/0xA7F2Be4e39Cb23F8a60a4E0C5408CA2570dC405d) dont le code source se trouve [ici](https://github.com/TakyL/nft_marketplace_solidity).
 La monnaie utilisé est le POL. Si vous n'avez pas de wallet POL, vous pouvez utiliser celui là : 
 - Wallet Address : ``` 0x501AFfB9402246e0E522aDaf7e2638A41859a426 ```
 - Private Key : ```0x116bbe4fb13bf060ad8497412aa1be43cb2be587446a37832da2d13a50a2681d```
